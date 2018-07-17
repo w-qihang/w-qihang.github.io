@@ -20,7 +20,7 @@ footer:
 author: 'Q.H.'
 nickname: ''
 bio: 'iOS开发，热爱技术'
-#avatar: '/assets/img/profile.png'
+avatar: '/assets/img/profile.png'
 
 # Search
 search: true
