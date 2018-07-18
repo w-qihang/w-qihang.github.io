@@ -30,7 +30,7 @@ nightMode: true
 
 # Comments 评论功能
 comments:
-  disqus: true
+  disqus: false
   disqus_url: 'https://liaokeyu.disqus.com/embed.js'
 
 # Gitalk
