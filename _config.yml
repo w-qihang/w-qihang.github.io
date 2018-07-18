@@ -28,11 +28,6 @@ search: true
 # Night mode
 nightMode: true
 
-# Comments 评论功能
-comments:
-  disqus: false
-  disqus_url: 'https://liaokeyu.disqus.com/embed.js'
-
 # Gitalk
 gitalk:
   enable: true    #是否开启Gitalk评论
