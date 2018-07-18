@@ -36,12 +36,12 @@ comments:
 # Gitalk
 gitalk:
   enable: true    #是否开启Gitalk评论
-  clientID: f2c84e7629bb1446c1a4                            #生成的clientID
-  clientSecret: ca6d6139d1e1b8c43f8b2e19492ddcac8b322d0d    #生成的clientSecret
-  repo: qiubaiying.github.io    #仓库名称
-  owner: qiubaiying    #github用户名
-  admin: qiubaiying
-  distractionFreeMode: true #是否启用类似FB的阴影遮罩
+  clientID: 063b33afa3148971ff8d                            #生成的clientID
+  clientSecret: 8941d45b6ad76643e361e8bd0c6b346b427e4332    #生成的clientSecret
+  repo: w-qihang.github.io    #仓库名称
+  owner: w-qihang    #github用户名
+  admin: w-qihang
+  #distractionFreeMode: true #是否启用类似FB的阴影遮罩
 
 # MathJax 公式支持 by Ray-Eldath
 mathjax: true
