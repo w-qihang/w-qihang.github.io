@@ -2,26 +2,6 @@
 
 基于Jekyll的博客主题模板，简洁轻量。
 
-另外，还有此主题的[Ghost版本](https://github.com/eastpiger/ghost-theme-H2O) by [eastpiger](https://github.com/eastpiger)
-
-### Preview
-
-#### [在线预览 Live Demo →](http://liaokeyu.com/)
-
-![](screenshot/jekyll-theme-h2o-realhome.jpg)
-
-![](screenshot/jekyll-theme-h2o-realm.png)
-
-如果你喜欢这个博客模板，请在右上角star一下，非常感谢～
-
-If you like this theme or using it, please give a ⭐️ for motivation ;)
-
-如果想体验手机浏览效果，可以扫一下二维码：
-
-![](screenshot/1494404591.png)
-
-Using your smartphone to scan the QR Code
-
 ### Features 特性
 
 #### CN
@@ -51,24 +31,6 @@ Using your smartphone to scan the QR Code
 - Tags system
 - Search
 - Copyright text on copy event
-
-### Usage 快速开始
-
-首先你需要安装Jekyll，请查看文档: [快速指南](http://jekyll.com.cn/docs/quickstart/)
-
-如果你已经安装了Jekyll，请检查版本是否为3.0.x，你可以使用 ```gem update jekyll``` 命令进行升级。
-
-使用 ```gem install jekyll-paginate``` 或 ```sudo gem install jekyll-paginate``` 安装Jekyll的分页插件。
-
-> H2O主题基于Jekyll 3.2.1版本，不同版本之间可能存在部分差异，具体请参考[官方更新文档](https://jekyllrb.com/news/)
-
-点击右上角Fork按钮在你的Github上创建分支，或者```clone```到本地。
-
-``` git clone https://github.com/kaeyleo/jekyll-theme-H2O.git ```
-
-最后，在命令行输入 ```jekyll server``` 开启服务，就能在本地预览主题了。
-
-如果需要部署到线上环境，请参照配置文档的 **开始** 章节进行操作。
 
 ### Document 配置文档
 
@@ -451,3 +413,5 @@ Any types of contribution are welcome. Thanks.
 ### License 许可证
 
 Jekyll-Theme-H2O is licensed under [MIT](https://github.com/kaeyleo/jekyll-theme-H2O/blob/master/LICENSE).
+
+
