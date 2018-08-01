@@ -8,8 +8,8 @@ tags: OC iOS
 ---
 ![](https://raw.githubusercontent.com/w-qihang/w-qihang.github.io/master/_posts/imgs/effectiveoc_contents.png)
 
-* [1 熟悉 Objective-C](#1)
-* [1.1 第2条:在类的头文件中尽量少引用其他头文件](#1.1)
+* [1.熟悉 Objective-C](#1)
+* [1.1第2条:在类的头文件中尽量少引用其他头文件](#1.1)
 
 
 <h2 id="1">熟悉 Objective-C</h2>
