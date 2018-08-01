@@ -6,6 +6,7 @@ date: 2018-08-01
 cover: 'https://raw.githubusercontent.com/w-qihang/w-qihang.github.io/master/_posts/imgs/effectiveOC.png'
 tags: OC iOS 
 ---
+![](https://raw.githubusercontent.com/w-qihang/w-qihang.github.io/master/_posts/imgs/effectiveoc_contents.png)
 
 第2条:在类的头文件中尽量少引用其他头文件
 在不需要知道某个类的实现细节,只需要知道类名的情况下,可在.h中可使用@class 类名 来"向前声明"该类,在.m中去import整个.h文件.这样可以尽量降低类之间的耦合,避免增加编译时间;
@@ -45,7 +46,7 @@ NSString *const EOCLoginManager = @"555";
         UIViewAutoresizingFlexibleHeight       = 1 << 4,
         UIViewAutoresizingFlexibleBottomMargin = 1 << 5
     };
-    
+
     //组合多个选项
     UIViewAutoresizing resizing = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         if(resizing & UIViewAutoresizingFlexibleWidth) {
