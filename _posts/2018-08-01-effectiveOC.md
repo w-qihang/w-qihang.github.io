@@ -163,9 +163,32 @@ hash值通过关键属性的按位异或来计算:
 某函数的最后一项操作是调用另外一个函数,就可以运用"尾调用优化"技术.编译器会生成跳转至另一函数所需的指令码,而且不会向调用堆栈中推入新的"栈帧".objc_msgSend函数会利用这一技术,令"跳至方法实现"变得更简单.
 
 <h4 id="12">第12条:理解消息转发机制</h4>
-消息转发分为两大阶段:
+给对象发送消息,会先在本类中搜索方法的实现,有就直接调用若没有则去父类查找直到NSObject,如果NSObject没有则进去消息转发:
 
-* "动态方法解析":
+* "动态方法解析":看能否动态添加方法,以处理这个"未知的选择器",其返回值表示这个类能否新增一个实例方法用以处理此选择器.使用这种办法的前提是相关代码已经写好,只等着运行的时候动态插在类里面.
+    ```
+    + (BOOL)resolveInstanceMethod:(SEL)sel {
+        return [super resolveInstanceMethod:sel];
+    }
+    + (BOOL)resolveClassMethod:(SEL)sel {
+        return [super resolveClassMethod:sel];
+    }
+    ```
+
+* 备援接收者:若当前接收者能找到备援对象则将其返回,若找不到就返回nil;
+    ```
+    - (id)forwardingTargetForSelector:(SEL)aSelector {
+        return nil;
+    }
+    ```
+* 完整的消息转发:实现此方法时,若发现某调用操作不应由本类处理,则需调用超类的同名方法.这样的话,继承体系中的每个类都有机会处理此请求,直至NSObject.NSObject会调用"doesNotRecognizeSelector:"
+    ```
+    -(void)forwardInvocation:(NSInvocation*)anInvocation {
+    }
+    - (NSMethodSignature*)methodSignatureForSelector:(SEL)aSelector {
+    }
+    ```
+
 <h4 id="13">第13条:用"方法调配技术"调试"黑盒方法"</h4>
 <h4 id="14">理解"类对象"的用意</h4>
 
