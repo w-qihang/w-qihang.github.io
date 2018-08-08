@@ -246,7 +246,7 @@ struct objc_class {
 假设有个SomeClass的子类从NSObject中继承,继承体系如图所示:
 ![objc_class]()
 
-<h4>在继承体系中查询类型信息</h4>
+<h5>在继承体系中查询类型信息</h5>
 
 * "isMemberOfClass:"能够判断对象是否是某个特定类的实例;
 * "isKindOfClass:"则能判断出对象是否为某类或其派生类的实例.
