@@ -244,7 +244,7 @@ struct objc_class {
 * 每个类仅有一个Class对象,每个Class对象仅有一个"元类"对象.
 
 假设有个SomeClass的子类从NSObject中继承,继承体系如图所示:
-![objc_class]()
+![objc_class](https://raw.githubusercontent.com/w-qihang/w-qihang.github.io/master/_posts/imgs/objc_class.png)
 
 <h5>在继承体系中查询类型信息</h5>
 
