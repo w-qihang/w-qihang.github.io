@@ -188,9 +188,80 @@ hash值通过关键属性的按位异或来计算:
     - (NSMethodSignature*)methodSignatureForSelector:(SEL)aSelector {
     }
     ```
+实际运用:[利用NSProxy实现消息转发-模块化的网络接口层设计](https://blog.csdn.net/xiaochong2154/article/details/44886973)
 
 <h4 id="13">第13条:用"方法调配技术"调试"黑盒方法"</h4>
+
+```
+Class class = [self class];
+    // 原方法名和替换方法名
+    SEL originalSelector = @selector(viewDidAppear:);
+    SEL swizzledSelector = @selector(swizzle_viewDidAppear:);
+    // 原方法结构体和替换方法结构体
+    Method originalMethod = class_getInstanceMethod(class, originalSelector);
+    Method swizzledMethod = class_getInstanceMethod(class, swizzledSelector);
+    // 如果当前类没有原方法的实现IMP，先调用class_addMethod来给原方法添加默认的方法实现IMP
+    BOOL didAddMethod = class_addMethod(class,originalSelector,method_getImplementation(swizzledMethod),method_getTypeEncoding(swizzledMethod));
+    if (didAddMethod) {// 添加方法实现IMP成功后，修改替换方法结构体内的方法实现IMP和方法类型编码TypeEncoding
+        class_replaceMethod(class,swizzledSelector,method_getImplementation(originalMethod),method_getTypeEncoding(originalMethod));
+    } else { // 添加失败，调用交互两个方法的实现
+        method_exchangeImplementations(originalMethod, swizzledMethod);
+    } 
+```
+> const char *types:"v@:"意思就是这已是一个void类型的方法，没有参数传入;"i@:"就是说这是一个int类型的方法，没有参数传入。"i@:@"就是说这是一个int类型的方法，又一个参数传入。
+
 <h4 id="14">理解"类对象"的用意</h4>
+
+```
+struct objc_object {
+    Class _Nonnull isa  OBJC_ISA_AVAILABILITY;
+};
+typedef struct objc_object *id;
+
+typedef struct objc_class *Class;
+struct objc_class {
+    Class _Nonnull isa  OBJC_ISA_AVAILABILITY;
+
+#if !__OBJC2__
+    Class _Nullable super_class                              OBJC2_UNAVAILABLE;
+    const char * _Nonnull name                               OBJC2_UNAVAILABLE;
+    long version                                             OBJC2_UNAVAILABLE;
+    long info                                                OBJC2_UNAVAILABLE;
+    long instance_size                                       OBJC2_UNAVAILABLE;
+    struct objc_ivar_list * _Nullable ivars                  OBJC2_UNAVAILABLE;
+    struct objc_method_list * _Nullable * _Nullable methodLists                    OBJC2_UNAVAILABLE;
+    struct objc_cache * _Nonnull cache                       OBJC2_UNAVAILABLE;
+    struct objc_protocol_list * _Nullable protocols          OBJC2_UNAVAILABLE;
+#endif
+
+} OBJC2_UNAVAILABLE;
+
+```
+
+* 每个对象结构体的首个成员是Class类型的变量,称为"isa"指针.该变量定义了对象所属类;
+* Class对象结构体存放类的"元数据"(metadata),包括类的成员变量,实例方法,协议列表,超类等等.
+* Class对象结构体的首个变量也是isa指针,说明它也是OC对象.对象所属类型(也就是isa指针指向类型),叫做"元类"(metaclass)."类方法"定义与此处.
+* 每个类仅有一个Class对象,每个Class对象仅有一个"元类"对象.
+
+假设有个SomeClass的子类从NSObject中继承,继承体系如图所示:
+![objc_class]()
+
+<h4>在继承体系中查询类型信息</h4>
+
+* "isMemberOfClass:"能够判断对象是否是某个特定类的实例;
+* "isKindOfClass:"则能判断出对象是否为某类或其派生类的实例.
+
+还有一种可以精确判断对象是否为某类实例的办法:
+
+```
+if([obj class] == [Person class]) {
+        //'obj' is an instance of Person
+    }
+```
+尽量可以这样做,但也要尽量使用类型信息查询方法来确定对象类型.因为某些对象可能实现了消息转发功能.
+> NSProxy代理对象虽遵循了NSObject协议,但在调用isKindOfClass:时,并未实现此方法,要把消息转发给"接受代理的对象".
+
+
 
 <h3 id="three">接口与API设计</h3>
 <h3 id="four">协议与分类</h3>
