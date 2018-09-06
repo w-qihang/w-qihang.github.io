@@ -452,6 +452,49 @@ static NSMutableDictionary* createDic() {
 
 <h4 id="50">第50条:构建缓存时选用NSCache而非NSDictionary</h4>
 
+* 实现缓存时应选用NSCache而非NSDictionary对象.因为NSCache可以提供优雅的自动删减功能,而且是"线程安全的",此外它还会删减"最久未使用对象",它与字典不同,并不会拷贝键.
+* 可以给NSCache对象设置上限,用以限制缓存中的对象总个数及"总开销",而这些尺度则定义了缓存删减其中对象的时机.但是绝对不要把这些尺度当成可靠的"硬限制",它们仅对NSCache起指导作用.应该在很快能计算出"开销值"的情况下,才考虑限制总开销.
+* 将NSPurgeableData与NSCache搭配使用,可实现自动清除数据的功能,当NSPurgeableData对象所占内存为系统所丢弃时,该对象自身也会从缓存中移除.
+* 只有那种"重新获取起来很费事的"数据,才值得放入缓存,比如需要从网络获取或从磁盘读取的数据.
+
 <h4 id="51">第51条:精简initialize与load的实现代码</h4>
 
+* 在加载阶段,如果类实现了load方法,那么系统就会调用它.分类里也可以定义此方法,类的load方法要比分类中的先调用.与其他方法不同,load方法不参与覆写机制.
+* 首次使用某个类之前,系统会向其发送initialize消息.由于此方法遵从普通的覆写规则,所以通常应该在里面判断当前要初始化的是哪个类.
+* load与initialize方法都应该实现的精简一些,这有助于保持应用程序的响应能力,也能减少引入"依赖环"的几率.
+* 无法在编译期设定的全局常量,可以放在initialize方法里初始化.
+
 <h4 id="52">第52条:别忘了NSTimer会保留其目标对象</h4>
+
+* NSTimer对象会保留其目标,直到定时器本身失效.调用invalidate可令定时器失效,一次性的定时器在触发完任务之后也会失效.
+* 反复执行任务的计时器很容易引入保留环,如果计时器的目标对象又保留了计时器本身,那肯定会导致保留环.
+打破保留环的方法:
+
+* 手动调用invalidate令定时器失效.
+* 用block来打破保留环.block里面弱引用目标对象self.
+    ```
+    //ios10已提供此方法
+    + (NSTimer *)scheduledTimerWithTimeInterval:(NSTimeInterval)interval repeats:(BOOL)repeats block:(void (^)(NSTimer *timer))block
+    ```
+* NSProxy对象作为NSTimer的目标对象,弱引用self对象,并将消息转发给self对象.
+```
+@interface LSYProxy : NSProxy
+@property (nonatomic,weak) id obj;
+@end
+
+LSYProxy *proxy = [LSYProxy alloc];
+proxy.obj = self;
+self.timer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:proxy selector:@selector(timerEvent) userInfo:nil repeats:YES];
+
+@implementation LSYProxy
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector {
+    NSMethodSignature *sig;
+    sig = [self.obj methodSignatureForSelector:aSelector];
+    return sig;
+
+}
+- (void)forwardInvocation:(NSInvocation *)invocation {
+    [invocation invokeWithTarget:self.obj];
+}
+@end
+```
