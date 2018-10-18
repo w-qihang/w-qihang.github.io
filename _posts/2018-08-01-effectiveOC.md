@@ -221,6 +221,7 @@ hash值通过关键属性的按位异或来计算:
 实际运用:[利用NSProxy实现消息转发-模块化的网络接口层设计](https://blog.csdn.net/xiaochong2154/article/details/44886973)
 
 <h4 id="13">第13条:用"方法调配技术"调试"黑盒方法"</h4>
+完整的method swizzling: 
 
 ```
 BOOL hoo_Swizzle(Class aClass, SEL originalSel, SEL swizzleSel)
@@ -228,11 +229,12 @@ BOOL hoo_Swizzle(Class aClass, SEL originalSel, SEL swizzleSel)
     //class_getInstanceMethod会通过originalSel从当前类及其父类到根类找method,如果都没有实现过，originalMethod为nil
     Method originalMethod = class_getInstanceMethod(aClass, originalSel);
     Method swizzleMethod = class_getInstanceMethod(aClass, swizzleSel);
+    //若直接进行method_exchangeImplementations,当子类没有originalMethod时,会把父类的originalMethod跟子类的swizzleMethod进行交换,而父类没有swizzleMethod的对应IMP,方法调用时出现崩溃.所以先进行class_addMethod.
     BOOL didAddMethod = class_addMethod(aClass, originalSel, method_getImplementation(swizzleMethod), method_getTypeEncoding(swizzleMethod));
     //当前类originalSel没有实现method,会添加成功;如果已经实现了,则添加失败,可以直接进行交换.
     if (didAddMethod) {
         class_replaceMethod(aClass, swizzleSel, method_getImplementation(originalMethod), method_getTypeEncoding(originalMethod));
-        
+
         //当originalMethod为nil时，这里的class_replaceMethod将不做替换，所以swizzleSel方法里的实现还是自己原来的实现,所以在swizzleSel中调用originalSel，其实调用的还是自身，出现死循环.在替换后将swizzleMethod设置为一个空实现.
         if (!originalMethod) {
           method_setImplementation(swizzleMethod, imp_implementationWithBlock(^(id self, SEL _cmd){ }));        
