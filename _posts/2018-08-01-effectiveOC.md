@@ -210,31 +210,38 @@ hash值通过关键属性的按位异或来计算:
     }
     ```
 * 完整的消息转发:实现此方法时,若发现某调用操作不应由本类处理,则需调用超类的同名方法.这样的话,继承体系中的每个类都有机会处理此请求,直至NSObject.NSObject会调用"doesNotRecognizeSelector:"
+
     ```
     -(void)forwardInvocation:(NSInvocation*)anInvocation {
     }
     - (NSMethodSignature*)methodSignatureForSelector:(SEL)aSelector {
     }
     ```
+
 实际运用:[利用NSProxy实现消息转发-模块化的网络接口层设计](https://blog.csdn.net/xiaochong2154/article/details/44886973)
 
 <h4 id="13">第13条:用"方法调配技术"调试"黑盒方法"</h4>
 
 ```
-Class class = [self class];
-    // 原方法名和替换方法名
-    SEL originalSelector = @selector(viewDidAppear:);
-    SEL swizzledSelector = @selector(swizzle_viewDidAppear:);
-    // 原方法结构体和替换方法结构体
-    Method originalMethod = class_getInstanceMethod(class, originalSelector);
-    Method swizzledMethod = class_getInstanceMethod(class, swizzledSelector);
-    // 如果当前类没有原方法的实现IMP，先调用class_addMethod来给原方法添加默认的方法实现IMP
-    BOOL didAddMethod = class_addMethod(class,originalSelector,method_getImplementation(swizzledMethod),method_getTypeEncoding(swizzledMethod));
-    if (didAddMethod) {// 添加方法实现IMP成功后，修改替换方法结构体内的方法实现IMP和方法类型编码TypeEncoding
-        class_replaceMethod(class,swizzledSelector,method_getImplementation(originalMethod),method_getTypeEncoding(originalMethod));
-    } else { // 添加失败，调用交互两个方法的实现
-        method_exchangeImplementations(originalMethod, swizzledMethod);
-    } 
+BOOL hoo_Swizzle(Class aClass, SEL originalSel, SEL swizzleSel)
+{
+    //class_getInstanceMethod会通过originalSel从当前类及其父类到根类找method,如果都没有实现过，originalMethod为nil
+    Method originalMethod = class_getInstanceMethod(aClass, originalSel);
+    Method swizzleMethod = class_getInstanceMethod(aClass, swizzleSel);
+    BOOL didAddMethod = class_addMethod(aClass, originalSel, method_getImplementation(swizzleMethod), method_getTypeEncoding(swizzleMethod));
+    //当前类originalSel没有实现method,会添加成功;如果已经实现了,则添加失败,可以直接进行交换.
+    if (didAddMethod) {
+        class_replaceMethod(aClass, swizzleSel, method_getImplementation(originalMethod), method_getTypeEncoding(originalMethod));
+        
+        //当originalMethod为nil时，这里的class_replaceMethod将不做替换，所以swizzleSel方法里的实现还是自己原来的实现,所以在swizzleSel中调用originalSel，其实调用的还是自身，出现死循环.在替换后将swizzleMethod设置为一个空实现.
+        if (!originalMethod) {
+          method_setImplementation(swizzleMethod, imp_implementationWithBlock(^(id self, SEL _cmd){ }));        
+        }   
+    } else {
+        method_exchangeImplementations(originalMethod, swizzleMethod);
+    }
+    return YES;
+}
 ```
 > const char *types:"v@:"意思就是这已是一个void类型的方法，没有参数传入;"i@:"就是说这是一个int类型的方法，没有参数传入。"i@:@"就是说这是一个int类型的方法，又一个参数传入。
 
