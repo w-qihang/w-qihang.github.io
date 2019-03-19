@@ -226,9 +226,10 @@ hash值通过关键属性的按位异或来计算:
 ```
 BOOL hoo_Swizzle(Class aClass, SEL originalSel, SEL swizzleSel)
 {
-    //class_getInstanceMethod会通过originalSel从当前类及其父类到根类找method,如果都没有实现过，originalMethod为nil
     Method originalMethod = class_getInstanceMethod(aClass, originalSel);
+    //class_getInstanceMethod会通过originalSel从当前类及其父类到根类找method,如果都没有实现过，originalMethod为nil
     Method swizzleMethod = class_getInstanceMethod(aClass, swizzleSel);
+
     //若直接进行method_exchangeImplementations,当子类没有originalMethod时,会把父类的originalMethod跟子类的swizzleMethod进行交换,而父类没有swizzleMethod的对应IMP,方法调用时出现崩溃.所以先进行class_addMethod.
     BOOL didAddMethod = class_addMethod(aClass, originalSel, method_getImplementation(swizzleMethod), method_getTypeEncoding(swizzleMethod));
     //当前类originalSel没有实现method,会添加成功;如果已经实现了,则添加失败,可以直接进行交换.
